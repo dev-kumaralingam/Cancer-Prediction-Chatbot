@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cancer Prediction Chatbot</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <h1>Cancer Prediction Chatbot</h1>
+      </div>
+      <div class="chat-messages" id="chat-messages">
+        <div class="message bot">
+          Welcome to the Cancer Prediction Chatbot. How can I assist you today?
+        </div>
+      </div>
+      <div class="chat-input">
+        <input
+          type="text"
+          id="user-input"
+          placeholder="Type your message here..."
+        />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <script>
+      function sendMessage() {
+        const userInput = document.getElementById("user-input");
+        const chatMessages = document.getElementById("chat-messages");
+
+        if (userInput.value.trim() !== "") {
+          chatMessages.innerHTML += `<div class="message user">${userInput.value}</div>`;
+
+          fetch("/chat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: userInput.value }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              chatMessages.innerHTML += `<div class="message bot">${data.response}</div>`;
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+
+          userInput.value = "";
+        }
+      }
+
+      document
+        .getElementById("user-input")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
+        });
+    </script>
+  </body>
+</html>
+
